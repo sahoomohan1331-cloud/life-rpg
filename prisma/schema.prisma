@@ -1,0 +1,163 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── ENUMS ─────────────────────────────────────────
+
+enum AttributeName {
+  WISDOM
+  VITALITY
+  CRAFT
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum TaskType {
+  QUEST
+  DAILY
+  HABIT
+}
+
+enum ItemCategory {
+  THEME
+  BADGE
+  DECOR
+  CONSUMABLE
+}
+
+// ─── MODELS ────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  timezone     String   @default("UTC")
+  createdAt    DateTime @default(now())
+
+  character      Character?
+  attributes     Attribute[]
+  tasks          Task[]
+  completions    Completion[]
+  streaks        Streak[]
+  inventoryItems InventoryItem[]
+  transactions   Transaction[]
+}
+
+model Character {
+  id            String  @id @default(cuid())
+  userId        String  @unique
+  level         Int     @default(1)
+  xp            Int     @default(0)
+  totalXp       Int     @default(0)
+  gold          Int     @default(0)
+  title         String  @default("Novice Adventurer")
+  equippedTheme String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Attribute {
+  id     String        @id @default(cuid())
+  userId String
+  name   AttributeName
+  level  Int           @default(1)
+  xp     Int           @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, name])
+}
+
+model Task {
+  id            String        @id @default(cuid())
+  userId        String
+  title         String
+  description   String?
+  difficulty    Difficulty    @default(MEDIUM)
+  attributeName AttributeName
+  type          TaskType      @default(QUEST)
+  dueAt         DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime      @default(now())
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  completions Completion[]
+
+  @@index([userId, completedAt])
+}
+
+model Completion {
+  id          String   @id @default(cuid())
+  taskId      String
+  userId      String
+  xpAwarded   Int
+  goldAwarded Int
+  completedAt DateTime @default(now())
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, completedAt])
+}
+
+model Streak {
+  id                String    @id @default(cuid())
+  userId            String
+  taskId            String?
+  current           Int       @default(0)
+  longest           Int       @default(0)
+  lastCompletedDate DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Item {
+  id         String       @id @default(cuid())
+  name       String
+  category   ItemCategory
+  price      Int
+  assetUrl   String?
+  effectJson Json?
+
+  inventoryItems InventoryItem[]
+  transactions   Transaction[]
+}
+
+model InventoryItem {
+  id         String   @id @default(cuid())
+  userId     String
+  itemId     String
+  acquiredAt DateTime @default(now())
+  equipped   Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, itemId])
+}
+
+model Transaction {
+  id        String   @id @default(cuid())
+  userId    String
+  itemId    String
+  price     Int
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+}
