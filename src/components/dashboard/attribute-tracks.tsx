@@ -45,7 +45,7 @@ export function AttributeTracks() {
       <h2 className="font-heading text-lg font-bold text-brown-deep mb-4">Attributes</h2>
       <div className="space-y-4">
         {attributes?.map((attr) => {
-          const config = ATTR_CONFIG[attr.name];
+          const config = ATTR_CONFIG[attr.name as keyof typeof ATTR_CONFIG] || ATTR_CONFIG.WISDOM;
           const Icon = config.icon;
           return (
             <div key={attr.id} className="flex items-center gap-3">

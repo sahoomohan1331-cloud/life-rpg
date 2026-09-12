@@ -1,4 +1,4 @@
-import { Difficulty } from "@prisma/client";
+import type { Difficulty } from "@/types";
 
 // ─── XP & LEVELING ────────────────────────────────
 

@@ -12,6 +12,7 @@ import {
   xpForLevel,
 } from "@/lib/progression";
 import { toDateString } from "@/lib/utils";
+import type { Difficulty } from "@/types";
 
 export async function POST(
   _request: Request,
@@ -97,7 +98,8 @@ export async function POST(
       const streakCurrent = globalStreak?.current || 0;
 
       // 5. Calculate rewards
-      const baseReward = DIFFICULTY_REWARDS[task.difficulty];
+      const diffKey = (task.difficulty as Difficulty) in DIFFICULTY_REWARDS ? (task.difficulty as Difficulty) : "MEDIUM";
+      const baseReward = DIFFICULTY_REWARDS[diffKey];
       const streakMultiplier = getStreakMultiplier(streakCurrent);
       const backfillMultiplier = getBackfillMultiplier(task.createdAt, new Date());
 

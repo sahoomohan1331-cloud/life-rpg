@@ -40,10 +40,10 @@ export function SignupForm() {
         body: JSON.stringify({ email, password, confirmPassword }),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
 
-      if (!data.success) {
-        setServerError(data.error?.message || "Something went wrong");
+      if (!res.ok || !data?.success) {
+        setServerError(data?.error?.message || "Failed to create character. Please try again.");
         setLoading(false);
         return;
       }
@@ -56,15 +56,16 @@ export function SignupForm() {
       });
 
       if (signInResult?.error) {
-        setServerError("Account created but login failed. Please log in manually.");
+        setServerError("Account created! Please log in.");
         setLoading(false);
+        router.push("/login");
         return;
       }
 
       router.push("/app");
       router.refresh();
-    } catch {
-      setServerError("Something went wrong. Please try again.");
+    } catch (err) {
+      setServerError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
       setLoading(false);
     }
   }

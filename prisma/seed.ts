@@ -114,12 +114,17 @@ async function main() {
   console.log("🌱 Seeding market items...");
 
   for (const item of SEED_ITEMS) {
+    const id = item.name.toLowerCase().replace(/\s+/g, "-").replace(/[()]/g, "");
+    const data = {
+      ...item,
+      effectJson: item.effectJson ? JSON.stringify(item.effectJson) : null,
+    };
     await prisma.item.upsert({
-      where: { id: item.name.toLowerCase().replace(/\s+/g, "-").replace(/[()]/g, "") },
-      update: { ...item },
+      where: { id },
+      update: data,
       create: {
-        id: item.name.toLowerCase().replace(/\s+/g, "-").replace(/[()]/g, ""),
-        ...item,
+        id,
+        ...data,
       },
     });
   }

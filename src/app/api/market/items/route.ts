@@ -35,6 +35,10 @@ export async function GET(request: NextRequest) {
 
     const itemsWithOwnership = items.map((item) => ({
       ...item,
+      effectJson:
+        typeof item.effectJson === "string"
+          ? JSON.parse(item.effectJson)
+          : item.effectJson,
       owned: ownedMap.has(item.id),
       equipped: ownedMap.get(item.id) || false,
     }));

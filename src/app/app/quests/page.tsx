@@ -226,7 +226,10 @@ function QuestCard({
   isPending: boolean;
   floatingXP: number | null;
 }) {
-  const AttrIcon = ATTR_ICONS[task.attributeName as keyof typeof ATTR_ICONS];
+  const AttrIcon = ATTR_ICONS[task.attributeName as keyof typeof ATTR_ICONS] || BookOpen;
+  const diffKey = (task.difficulty as keyof typeof DIFFICULTY_COLORS) in DIFFICULTY_COLORS
+    ? (task.difficulty as keyof typeof DIFFICULTY_COLORS)
+    : "MEDIUM";
 
   return (
     <motion.li
@@ -240,7 +243,7 @@ function QuestCard({
         <button
           onClick={() => onComplete(task.id)}
           disabled={isPending}
-          className="w-7 h-7 mt-0.5 rounded-full border-2 border-amber-warm/30 flex items-center justify-center hover:border-green-muted hover:bg-green-muted/10 transition-all flex-shrink-0 disabled:opacity-50"
+          className="mt-0.5 w-5 h-5 rounded-full border-2 border-amber-warm/40 hover:border-green-muted hover:bg-green-muted/10 transition-all flex items-center justify-center flex-shrink-0 group"
           aria-label={`Complete quest: ${task.title}`}
         >
           <Check className="h-3.5 w-3.5 text-green-muted opacity-0 group-hover:opacity-60 transition-opacity" aria-hidden="true" />
@@ -252,7 +255,7 @@ function QuestCard({
             <p className="text-sm text-brown-soft mt-0.5 line-clamp-2">{task.description}</p>
           )}
           <div className="flex items-center gap-2 mt-2 flex-wrap">
-            <span className={`text-xs px-2 py-0.5 rounded-full border ${DIFFICULTY_COLORS[task.difficulty]}`}>
+            <span className={`text-xs px-2 py-0.5 rounded-full border ${DIFFICULTY_COLORS[diffKey]}`}>
               {task.difficulty}
             </span>
             <span className="text-xs text-brown-soft flex items-center gap-1">
@@ -267,7 +270,7 @@ function QuestCard({
 
         <div className="flex items-center gap-2 flex-shrink-0">
           <span className="text-sm font-mono text-green-muted font-medium">
-            +{DIFFICULTY_XP[task.difficulty]} XP
+            +{DIFFICULTY_XP[diffKey]} XP
           </span>
           <button
             onClick={() => onDelete(task.id)}

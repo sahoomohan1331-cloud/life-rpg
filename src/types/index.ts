@@ -1,8 +1,4 @@
 import type {
-  AttributeName,
-  Difficulty,
-  TaskType,
-  ItemCategory,
   Character,
   Attribute,
   Task,
@@ -12,12 +8,14 @@ import type {
   InventoryItem,
 } from "@prisma/client";
 
+// Domain Enum Types
+export type AttributeName = "WISDOM" | "VITALITY" | "CRAFT";
+export type Difficulty = "EASY" | "MEDIUM" | "HARD";
+export type TaskType = "QUEST" | "DAILY" | "HABIT";
+export type ItemCategory = "THEME" | "BADGE" | "DECOR" | "CONSUMABLE";
+
 // Re-export Prisma types
 export type {
-  AttributeName,
-  Difficulty,
-  TaskType,
-  ItemCategory,
   Character,
   Attribute,
   Task,
