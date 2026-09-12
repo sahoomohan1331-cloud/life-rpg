@@ -1,26 +1,149 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ─── Cozy Lo-fi Study Room Theme ─────────────────── */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Colors */
+  --color-cream: #FDF6E3;
+  --color-parchment: #F5E6D3;
+  --color-amber-warm: #D4A574;
+  --color-amber-light: #E8C9A0;
+  --color-amber-dark: #B8956A;
+  --color-brown-soft: #8B7355;
+  --color-brown-dark: #5C4033;
+  --color-brown-deep: #3D2B1F;
+  --color-green-muted: #7D9B76;
+  --color-green-light: #A8C5A0;
+  --color-green-dark: #5A7D52;
+  --color-gold: #C9A84C;
+  --color-gold-light: #E0C878;
+  --color-ember: #B85C38;
+  --color-ember-light: #D4845E;
+
+  /* Semantic */
+  --color-background: #FDF6E3;
+  --color-foreground: #5C4033;
+  --color-card: #F5E6D3;
+  --color-card-foreground: #5C4033;
+  --color-primary: #D4A574;
+  --color-primary-foreground: #3D2B1F;
+  --color-secondary: #E8C9A0;
+  --color-secondary-foreground: #5C4033;
+  --color-muted: #F0DCC8;
+  --color-muted-foreground: #8B7355;
+  --color-accent: #7D9B76;
+  --color-accent-foreground: #FFFFFF;
+  --color-destructive: #B85C38;
+  --color-destructive-foreground: #FFFFFF;
+  --color-border: #D4A57440;
+  --color-input: #D4A57430;
+  --color-ring: #D4A574;
+  --color-success: #7D9B76;
+
+  /* Fonts */
+  --font-heading: "Fraunces", Georgia, serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Border radius */
+  --radius-cozy: 12px;
+  --radius-lg: 10px;
+  --radius-md: 8px;
+  --radius-sm: 6px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── Base Styles ──────────────────────────────────── */
+
+* {
+  border-color: var(--color-border);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  color: var(--color-brown-deep);
+}
+
+/* ─── Focus Styles (Accessibility) ─────────────────── */
+
+*:focus-visible {
+  outline: 2px solid var(--color-amber-warm);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ─── Scrollbar ────────────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-cream);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-amber-light);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-amber-warm);
+}
+
+/* ─── Reduced Motion ──────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ─── Skeleton Pulse ───────────────────────────────── */
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+}
+
+.skeleton-pulse {
+  animation: skeleton-pulse 2s ease-in-out infinite;
+  background: var(--color-parchment);
+}
+
+/* ─── Floating XP Animation ────────────────────────── */
+
+@keyframes float-up {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-60px) scale(1.2);
+  }
+}
+
+.animate-float-up {
+  animation: float-up 1.5s ease-out forwards;
+}
+
+/* ─── Glow effect ──────────────────────────────────── */
+
+@keyframes warm-glow {
+  0%, 100% { box-shadow: 0 0 15px rgba(212, 165, 116, 0.2); }
+  50% { box-shadow: 0 0 25px rgba(212, 165, 116, 0.4); }
+}
+
+.animate-warm-glow {
+  animation: warm-glow 3s ease-in-out infinite;
 }
