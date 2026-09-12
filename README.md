@@ -215,7 +215,7 @@ model Task {
 
 ### 1. Clone & Install
 ```bash
-git clone https://github.com/your-username/life-rpg.git
+git clone https://github.com/sahoomohan1331-cloud/life-rpg.git
 cd life-rpg
 npm install
 ```
