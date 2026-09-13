@@ -60,7 +60,8 @@ export async function getTransporter(): Promise<nodemailer.Transporter> {
 export async function sendEmail({ to, subject, html, text }: SendEmailOptions): Promise<SendEmailResult> {
   try {
     const transporter = await getTransporter();
-    const from = process.env.EMAIL_FROM || '"Life RPG" <noreply@liferpg.dev>';
+    const rawFrom = process.env.EMAIL_FROM || process.env.SMTP_USER || "Life RPG <noreply@liferpg.dev>";
+    const from = rawFrom.replace(/\\"/g, "").replace(/\\/g, "").trim();
 
     const info = await transporter.sendMail({
       from,
