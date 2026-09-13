@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { signupSchema } from "@/schemas/auth";
+import { sendWelcomeEmail } from "@/lib/mailer";
 
 export async function POST(request: Request) {
   try {
@@ -86,6 +87,11 @@ export async function POST(request: Request) {
       });
 
       return newUser;
+    });
+
+    // Send welcome scroll notification to user's real email in background
+    sendWelcomeEmail({ to: user.email }).catch((err) => {
+      console.error("Failed to send welcome email:", err);
     });
 
     return NextResponse.json(

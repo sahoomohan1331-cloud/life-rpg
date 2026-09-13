@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { forgotPasswordSchema } from "@/schemas/auth";
+import { sendPasswordResetEmail } from "@/lib/mailer";
 
 export async function POST(request: Request) {
   try {
@@ -62,16 +63,25 @@ export async function POST(request: Request) {
     const origin = request.headers.get("origin") || "http://localhost:3000";
     const resetUrl = `${origin}/reset-password?token=${token}`;
 
-    console.log(`[AUTH] Password reset requested for ${email}: ${resetUrl}`);
+    // Send real email notification via Nodemailer / SMTP
+    const emailResult = await sendPasswordResetEmail({
+      to: email,
+      resetUrl,
+    });
+
+    console.log(`[AUTH] Password reset email dispatched to ${email}:`, {
+      messageId: emailResult.messageId,
+      previewUrl: emailResult.previewUrl,
+    });
 
     return NextResponse.json({
       success: true,
       data: {
         message:
-          "If an account with this email exists, instructions to reset your password have been sent.",
-        // Provided for local testing and developer preview
-        previewUrl: resetUrl,
+          "If an account with this email exists, instructions to reset your password have been dispatched to your inbox.",
+        previewUrl: emailResult.previewUrl || resetUrl,
         token,
+        emailDispatched: emailResult.success,
       },
     });
   } catch (error) {
