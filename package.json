@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --hostname 0.0.0.0",
-    "build": "next build",
+    "build": "node scripts/prepare-db.js && next build",
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
