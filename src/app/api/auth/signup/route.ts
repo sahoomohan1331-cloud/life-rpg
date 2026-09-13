@@ -108,7 +108,7 @@ export async function POST(request: Request) {
         success: false,
         error: {
           code: "SERVER_ERROR",
-          message: "Something went wrong. Please try again.",
+          message: error instanceof Error ? error.message : "Something went wrong. Please try again.",
         },
       },
       { status: 500 }

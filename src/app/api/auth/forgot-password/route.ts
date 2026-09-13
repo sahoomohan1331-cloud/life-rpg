@@ -91,7 +91,7 @@ export async function POST(request: Request) {
         success: false,
         error: {
           code: "INTERNAL_ERROR",
-          message: "Failed to process password reset. Please try again later.",
+          message: error instanceof Error ? error.message : "Failed to process password reset. Please try again later.",
         },
       },
       { status: 500 }
