@@ -24,8 +24,9 @@ model User {
   tasks          Task[]
   completions    Completion[]
   streaks        Streak[]
-  inventoryItems InventoryItem[]
-  transactions   Transaction[]
+  inventoryItems      InventoryItem[]
+  transactions        Transaction[]
+  passwordResetTokens PasswordResetToken[]
 }
 
 model Character {
@@ -133,3 +134,17 @@ model Transaction {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   item Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
 }
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+}
+

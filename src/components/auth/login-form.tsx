@@ -4,7 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { loginSchema } from "@/schemas/auth";
-import { Loader2 } from "lucide-react";
+import Link from "next/link";
+import { EmailInput } from "@/components/auth/email-input";
+import { Loader2, Lock } from "lucide-react";
 
 export function LoginForm() {
   const router = useRouter();
@@ -59,39 +61,43 @@ export function LoginForm() {
         </div>
       )}
 
-      <div>
-        <label htmlFor="login-email" className="block text-sm font-medium text-brown-dark mb-1.5">
-          Email
-        </label>
-        <input
-          id="login-email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-4 py-2.5 bg-cream border border-amber-warm/30 rounded-[8px] text-brown-dark placeholder:text-brown-soft/50 focus:outline-none focus:ring-2 focus:ring-amber-warm/50 transition-all"
-          placeholder="adventurer@quest.com"
-          autoComplete="email"
-          required
-        />
-        {errors.email && (
-          <p className="text-ember text-xs mt-1" role="alert">{errors.email}</p>
-        )}
-      </div>
+      {/* Real Email Input with Live Typo Suggestions */}
+      <EmailInput
+        id="login-email"
+        value={email}
+        onChange={setEmail}
+        error={errors.email}
+        placeholder="adventurer@quest.com"
+        autoComplete="email"
+      />
 
       <div>
-        <label htmlFor="login-password" className="block text-sm font-medium text-brown-dark mb-1.5">
-          Password
-        </label>
-        <input
-          id="login-password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-4 py-2.5 bg-cream border border-amber-warm/30 rounded-[8px] text-brown-dark placeholder:text-brown-soft/50 focus:outline-none focus:ring-2 focus:ring-amber-warm/50 transition-all"
-          placeholder="Your password"
-          autoComplete="current-password"
-          required
-        />
+        <div className="flex items-center justify-between mb-1.5">
+          <label htmlFor="login-password" className="block text-sm font-medium text-brown-dark">
+            Password
+          </label>
+          <Link
+            href="/forgot-password"
+            className="text-xs text-amber-warm hover:text-amber-dark font-medium transition-colors"
+          >
+            Forgot password?
+          </Link>
+        </div>
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-brown-soft/60">
+            <Lock className="h-4 w-4" aria-hidden="true" />
+          </div>
+          <input
+            id="login-password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full pl-9.5 pr-4 py-2.5 bg-cream border border-amber-warm/30 rounded-[10px] text-brown-dark placeholder:text-brown-soft/50 focus:outline-none focus:ring-2 focus:ring-amber-warm/50 transition-all text-sm"
+            placeholder="Your password"
+            autoComplete="current-password"
+            required
+          />
+        </div>
         {errors.password && (
           <p className="text-ember text-xs mt-1" role="alert">{errors.password}</p>
         )}
