@@ -2,8 +2,9 @@
 
 import { useCharacter } from "@/hooks/use-character";
 import { motion } from "framer-motion";
-import { Crown, Coins } from "lucide-react";
+import { Crown, Coins, Zap } from "lucide-react";
 import { formatNumber } from "@/lib/utils";
+import { getTitleForLevel } from "@/lib/progression";
 
 export function CharacterCard() {
   const { data: character, isLoading } = useCharacter();
@@ -27,6 +28,9 @@ export function CharacterCard() {
 
   const circumference = 2 * Math.PI * 36;
   const strokeDashoffset = circumference * (1 - character.xpProgress);
+  const xpRemaining = Math.max(0, character.xpToNextLevel - character.xp);
+  const nextLevel = character.level + 1;
+  const nextTitle = getTitleForLevel(nextLevel);
 
   return (
     <div className="bg-parchment rounded-[16px] p-6 border border-amber-warm/15 shadow-sm">
@@ -73,8 +77,8 @@ export function CharacterCard() {
               {character.title}
             </h2>
           </div>
-          <p className="text-sm text-brown-soft mb-3">
-            Level {character.level} · {character.xp} / {character.xpToNextLevel} XP
+          <p className="text-sm text-brown-soft mb-2">
+            Level {character.level} · {character.xp} / {character.xpToNextLevel} XP ({Math.round(character.xpProgress * 100)}%)
           </p>
 
           {/* XP Bar */}
@@ -87,13 +91,26 @@ export function CharacterCard() {
             />
           </div>
 
-          {/* Gold */}
-          <div className="flex items-center gap-1.5">
-            <Coins className="h-4 w-4 text-gold" aria-hidden="true" />
-            <span className="text-sm font-semibold text-brown-dark font-mono">
-              {formatNumber(character.gold)}
-            </span>
-            <span className="text-sm text-brown-soft">Gold</span>
+          {/* Bottom row: XP Countdown Badge + Gold Counter */}
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cream/90 border border-amber-warm/25 text-xs text-brown-dark font-medium shadow-2xs">
+              <Zap className="h-3 w-3 text-amber-warm fill-amber-warm" aria-hidden="true" />
+              <span>
+                <strong className="font-mono text-green-muted font-bold">{xpRemaining} XP</strong> to Lv.{nextLevel}
+                {nextTitle !== character.title && (
+                  <span className="text-brown-soft ml-1 hidden sm:inline">({nextTitle})</span>
+                )}
+              </span>
+            </div>
+
+            {/* Gold */}
+            <div className="flex items-center gap-1.5">
+              <Coins className="h-4 w-4 text-gold" aria-hidden="true" />
+              <span className="text-sm font-semibold text-brown-dark font-mono">
+                {formatNumber(character.gold)}
+              </span>
+              <span className="text-sm text-brown-soft">Gold</span>
+            </div>
           </div>
         </div>
       </div>

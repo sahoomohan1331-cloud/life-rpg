@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useTasks, useCreateTask, useDeleteTask } from "@/hooks/use-tasks";
+import { useTasks, useDeleteTask } from "@/hooks/use-tasks";
 import { useCompleteTask } from "@/hooks/use-complete-task";
 import { useSoundContext } from "@/components/providers/sound-provider";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { LevelUpModal } from "@/components/shared/level-up-modal";
+import { StarterQuestsQuickPack } from "@/components/dashboard/starter-quests";
+import { CreateQuestModal } from "@/components/quests/create-quest-modal";
 import {
   Plus,
   Check,
@@ -17,11 +19,8 @@ import {
   Heart,
   Wrench,
   Filter,
-  X,
-  Loader2,
 } from "lucide-react";
-import { createTaskSchema } from "@/schemas/task";
-import type { CreateTaskInput, Task } from "@/types";
+import type { Task } from "@/types";
 
 const ATTR_ICONS = {
   WISDOM: BookOpen,
@@ -96,10 +95,13 @@ export default function QuestsPage() {
         <h1 className="font-heading text-3xl font-bold text-brown-deep">Quests</h1>
         <button
           onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-amber-warm text-brown-deep font-semibold rounded-[8px] hover:bg-amber-dark transition-colors shadow-sm"
+          className="flex items-center gap-2 px-4 py-2.5 bg-amber-warm text-brown-deep font-semibold rounded-[8px] hover:bg-amber-dark transition-colors shadow-sm cursor-pointer"
         >
           <Plus className="h-4 w-4" aria-hidden="true" />
-          New Quest
+          <span>New Quest</span>
+          <kbd className="hidden sm:inline-block text-[10px] px-1.5 py-0.5 rounded bg-brown-deep/15 text-brown-deep font-mono font-normal">
+            Q
+          </kbd>
         </button>
       </div>
 
@@ -130,18 +132,22 @@ export default function QuestsPage() {
           ))}
         </div>
       ) : incompleteTasks.length === 0 && completedTasks.length === 0 ? (
-        <div className="text-center py-16 bg-parchment rounded-[16px] border border-amber-warm/15">
-          <Scroll className="h-16 w-16 text-amber-warm/30 mx-auto mb-4" aria-hidden="true" />
-          <h3 className="font-heading text-xl font-semibold text-brown-deep mb-2">
-            No quests yet
+        <div className="text-center py-12 px-6 bg-parchment rounded-[16px] border border-amber-warm/15 max-w-xl mx-auto">
+          <Scroll className="h-12 w-12 text-amber-warm/30 mx-auto mb-3" aria-hidden="true" />
+          <h3 className="font-heading text-xl font-semibold text-brown-deep mb-1">
+            Your Quest Log is Empty
           </h3>
-          <p className="text-brown-soft mb-6">Create your first quest and start earning XP!</p>
+          <p className="text-sm text-brown-soft mb-4">
+            Begin your journey by creating a custom quest or picking a starter quest below.
+          </p>
           <button
             onClick={() => setShowCreate(true)}
-            className="px-6 py-2.5 bg-amber-warm text-brown-deep font-semibold rounded-[8px] hover:bg-amber-dark transition-colors"
+            className="px-5 py-2.5 bg-amber-warm text-cream font-semibold rounded-[8px] hover:bg-amber-warm/90 transition-colors shadow-xs text-sm inline-flex items-center gap-2"
           >
-            Create Your First Quest
+            <Plus className="h-4 w-4" />
+            Inscribe Custom Quest
           </button>
+          <StarterQuestsQuickPack />
         </div>
       ) : (
         <div className="space-y-6">
@@ -298,195 +304,5 @@ function QuestCard({
         )}
       </AnimatePresence>
     </motion.li>
-  );
-}
-
-// ─── Create Quest Modal ──────────────────────────
-
-function CreateQuestModal({ onClose }: { onClose: () => void }) {
-  const createTask = useCreateTask();
-  const [formData, setFormData] = useState<CreateTaskInput>({
-    title: "",
-    description: "",
-    difficulty: "MEDIUM",
-    attributeName: "WISDOM",
-    type: "QUEST",
-    dueAt: null,
-  });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setErrors({});
-
-    const parsed = createTaskSchema.safeParse(formData);
-    if (!parsed.success) {
-      const fieldErrors: Record<string, string> = {};
-      for (const [key, msgs] of Object.entries(parsed.error.flatten().fieldErrors)) {
-        fieldErrors[key] = msgs?.[0] || "Invalid";
-      }
-      setErrors(fieldErrors);
-      return;
-    }
-
-    try {
-      await createTask.mutateAsync(parsed.data);
-      toast.success("Quest created! 📜");
-      onClose();
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to create quest");
-    }
-  }
-
-  return (
-    <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-brown-deep/40 backdrop-blur-sm" onClick={onClose} />
-
-      {/* Modal */}
-      <motion.div
-        className="relative bg-parchment rounded-[16px] p-6 w-full max-w-lg shadow-xl border border-amber-warm/20"
-        initial={{ scale: 0.95, y: 20 }}
-        animate={{ scale: 1, y: 0 }}
-        exit={{ scale: 0.95, y: 20 }}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="create-quest-title"
-      >
-        <div className="flex items-center justify-between mb-6">
-          <h2 id="create-quest-title" className="font-heading text-xl font-bold text-brown-deep">
-            New Quest
-          </h2>
-          <button
-            onClick={onClose}
-            className="p-1.5 text-brown-soft hover:text-brown-dark transition-colors rounded-[6px]"
-            aria-label="Close dialog"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Title */}
-          <div>
-            <label htmlFor="quest-title" className="block text-sm font-medium text-brown-dark mb-1">
-              Quest Title
-            </label>
-            <input
-              id="quest-title"
-              type="text"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-3 py-2.5 bg-cream border border-amber-warm/30 rounded-[8px] text-brown-dark placeholder:text-brown-soft/50 focus:outline-none focus:ring-2 focus:ring-amber-warm/50"
-              placeholder="e.g., Read 30 pages of a book"
-              autoFocus
-            />
-            {errors.title && <p className="text-ember text-xs mt-1">{errors.title}</p>}
-          </div>
-
-          {/* Description */}
-          <div>
-            <label htmlFor="quest-desc" className="block text-sm font-medium text-brown-dark mb-1">
-              Description <span className="text-brown-soft">(optional)</span>
-            </label>
-            <textarea
-              id="quest-desc"
-              value={formData.description || ""}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-3 py-2.5 bg-cream border border-amber-warm/30 rounded-[8px] text-brown-dark placeholder:text-brown-soft/50 focus:outline-none focus:ring-2 focus:ring-amber-warm/50 h-20 resize-none"
-              placeholder="Add details about this quest..."
-            />
-          </div>
-
-          {/* Difficulty */}
-          <div>
-            <label className="block text-sm font-medium text-brown-dark mb-1.5">Difficulty</label>
-            <div className="flex gap-2">
-              {(["EASY", "MEDIUM", "HARD"] as const).map((d) => (
-                <button
-                  key={d}
-                  type="button"
-                  onClick={() => setFormData({ ...formData, difficulty: d })}
-                  className={`flex-1 py-2 text-sm rounded-[8px] border font-medium transition-all ${
-                    formData.difficulty === d
-                      ? DIFFICULTY_COLORS[d]
-                      : "border-amber-warm/20 text-brown-soft hover:bg-cream"
-                  }`}
-                >
-                  {d} ({DIFFICULTY_XP[d]} XP)
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Attribute */}
-          <div>
-            <label className="block text-sm font-medium text-brown-dark mb-1.5">Attribute</label>
-            <div className="flex gap-2">
-              {(["WISDOM", "VITALITY", "CRAFT"] as const).map((a) => {
-                const Icon = ATTR_ICONS[a];
-                return (
-                  <button
-                    key={a}
-                    type="button"
-                    onClick={() => setFormData({ ...formData, attributeName: a })}
-                    className={`flex-1 py-2 text-sm rounded-[8px] border font-medium transition-all flex items-center justify-center gap-1.5 ${
-                      formData.attributeName === a
-                        ? "bg-amber-warm/15 border-amber-warm/30 text-brown-deep"
-                        : "border-amber-warm/20 text-brown-soft hover:bg-cream"
-                    }`}
-                  >
-                    <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-                    {a.charAt(0) + a.slice(1).toLowerCase()}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Type */}
-          <div>
-            <label className="block text-sm font-medium text-brown-dark mb-1.5">Type</label>
-            <div className="flex gap-2">
-              {(["QUEST", "DAILY", "HABIT"] as const).map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => setFormData({ ...formData, type: t })}
-                  className={`flex-1 py-2 text-sm rounded-[8px] border font-medium transition-all ${
-                    formData.type === t
-                      ? "bg-amber-warm/15 border-amber-warm/30 text-brown-deep"
-                      : "border-amber-warm/20 text-brown-soft hover:bg-cream"
-                  }`}
-                >
-                  {t.charAt(0) + t.slice(1).toLowerCase()}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={createTask.isPending}
-            className="w-full py-3 bg-amber-warm text-brown-deep font-bold rounded-[8px] hover:bg-amber-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-          >
-            {createTask.isPending ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                Creating...
-              </>
-            ) : (
-              "Create Quest"
-            )}
-          </button>
-        </form>
-      </motion.div>
-    </motion.div>
   );
 }

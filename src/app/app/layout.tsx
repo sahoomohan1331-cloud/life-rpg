@@ -3,6 +3,7 @@ import { QueryProvider } from "@/components/providers/query-provider";
 import { SessionProvider } from "@/components/providers/session-provider";
 import { SoundProvider } from "@/components/providers/sound-provider";
 import { AppNav } from "@/components/shared/app-nav";
+import { GlobalShortcuts } from "@/components/shared/global-shortcuts";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
@@ -30,6 +31,7 @@ export default function AppLayout({
               </div>
             </main>
           </div>
+          <GlobalShortcuts />
           <Toaster
             position="bottom-right"
             toastOptions={{

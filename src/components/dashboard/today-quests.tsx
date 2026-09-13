@@ -9,6 +9,7 @@ import { useState, useCallback } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
 import { LevelUpModal } from "@/components/shared/level-up-modal";
+import { StarterQuestsQuickPack } from "@/components/dashboard/starter-quests";
 
 export function TodayQuests() {
   const { data: tasks, isLoading } = useTasks({ completed: false });
@@ -83,15 +84,19 @@ export function TodayQuests() {
       </div>
 
       {todayQuests.length === 0 ? (
-        <div className="text-center py-8">
-          <Scroll className="h-12 w-12 text-amber-warm/40 mx-auto mb-3" aria-hidden="true" />
-          <p className="text-brown-soft text-sm mb-3">No quests yet — start your adventure!</p>
+        <div className="text-center py-6">
+          <Scroll className="h-10 w-10 text-amber-warm/40 mx-auto mb-2" aria-hidden="true" />
+          <p className="text-brown-dark font-medium text-sm">No quests yet — begin your adventure!</p>
+          <p className="text-xs text-brown-soft mt-0.5 mb-3">
+            Inscribe a custom quest or click a quick-start quest below to start earning XP immediately.
+          </p>
           <Link
             href="/app/quests"
-            className="inline-block px-4 py-2 bg-amber-warm text-brown-deep text-sm font-semibold rounded-[8px] hover:bg-amber-dark transition-colors"
+            className="inline-block px-4 py-2 bg-amber-warm text-cream text-xs font-semibold rounded-[8px] hover:bg-amber-warm/90 transition-colors shadow-xs"
           >
-            Create Your First Quest
+            Inscribe Custom Quest
           </Link>
+          <StarterQuestsQuickPack />
         </div>
       ) : (
         <ul className="space-y-2">
