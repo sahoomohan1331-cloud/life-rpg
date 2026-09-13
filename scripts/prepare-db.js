@@ -2,7 +2,16 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-const dbUrl = process.env.DATABASE_URL || process.env.POSTGRES_PRISMA_URL || process.env.POSTGRES_URL || '';
+// Detect any Postgres connection string from Vercel / Neon / Supabase
+const dbUrl =
+  process.env.DATABASE_URL ||
+  process.env.POSTGRES_PRISMA_URL ||
+  process.env.POSTGRES_URL ||
+  process.env.STORAGE_PRISMA_URL ||
+  process.env.STORAGE_URL ||
+  process.env.POSTGRES_URL_NON_POOLING ||
+  process.env.STORAGE_URL_NON_POOLING ||
+  '';
 
 if (dbUrl.startsWith('postgres://') || dbUrl.startsWith('postgresql://')) {
   console.log('[prepare-db] Detected PostgreSQL environment.');
@@ -14,9 +23,13 @@ if (dbUrl.startsWith('postgres://') || dbUrl.startsWith('postgresql://')) {
     console.log('[prepare-db] Copied schema.postgresql.prisma to schema.prisma');
   }
 
-  if (!process.env.DATABASE_URL && (process.env.POSTGRES_PRISMA_URL || process.env.POSTGRES_URL)) {
-    process.env.DATABASE_URL = process.env.POSTGRES_PRISMA_URL || process.env.POSTGRES_URL;
-  }
+  // Ensure DATABASE_URL and DIRECT_URL are exported for Prisma CLI
+  process.env.DATABASE_URL = dbUrl;
+  process.env.DIRECT_URL =
+    process.env.DIRECT_URL ||
+    process.env.POSTGRES_URL_NON_POOLING ||
+    process.env.STORAGE_URL_NON_POOLING ||
+    dbUrl;
 
   try {
     console.log('[prepare-db] Synchronizing database tables with PostgreSQL...');
